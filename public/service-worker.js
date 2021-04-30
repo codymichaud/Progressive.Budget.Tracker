@@ -31,5 +31,31 @@ self.addEventListener('activate', (evt) => {
             );
         })
     );
+    self.clients.claim();
 });
 
+//Creating fetch request to api and then caching the requests to DATA_CACHE_NAME
+self.addEventListener('fetch', (evt) => {
+    if (evt.request.url.includes('/api')) {
+        evt.respondWith(
+            caches.open(DATA_CACHE_NAME).then(cache => {
+                return fetch(evt.request).then(response => {
+                    if (response.status === 200) {
+                        cache.put(evt.request.url, response.clone());
+                    }
+                    return response;
+                })
+                    .catch((error) => {
+                        return cache.match(evt.request);
+                    });
+            })
+        )
+        return;
+    }
+
+    evt.respondWith(
+        caches.match(evt.request).then((response) => {
+            return response || fetch(evt.request);
+        })
+    );
+});
