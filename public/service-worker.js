@@ -11,3 +11,25 @@ const FILES_TO_CACHE = [
 ];
 
 //Installing service worker to app
+self.addEventListener('install', (evt) => {
+    evt.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+    );
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (evt) => {
+    evt.waitUntil(
+        caches.keys().then(keyList => {
+            return Promise.all(
+                keyList.map(key => {
+                    if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+                        console.log('Removing all old cache data', key);
+                        return caches.delete(key);
+                    }
+                })
+            );
+        })
+    );
+});
+
