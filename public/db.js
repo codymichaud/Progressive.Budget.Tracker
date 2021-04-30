@@ -1,6 +1,6 @@
 const { response } = require("express");
 
-let budgetDb; //creating database
+let budgetDb; //creating database budgetDb
 const request = indexedDB.open('budget', 1);
 
 request.onupgradeneeded = ({ event }) => {
@@ -21,3 +21,8 @@ request.onerror = ({ event }) => {
     console.log('Looks like there an error ' + event.target.errorCode);
 };
 
+//Allows for data to be saved to the database budgetDb
+function saveRecord(records) {
+    const transactions = budgetDb.transactions(['newData', 'readwrite']);
+    const store = transactions.objectStore('newData');
+}
